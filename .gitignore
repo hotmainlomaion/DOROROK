@@ -1,0 +1,51 @@
+# ── Android / Gradle ─────────────────────────────────────────────
+*.apk
+*.aab
+*.ap_
+*.aar
+*.dex
+*.class
+bin/
+gen/
+out/
+release/
+.gradle/
+build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+gradle-app.setting
+.gradletasknamecache
+# gradle-wrapper.jar 는 저장소에 커밋한다 (래퍼 자체가 빌드 진입점)
+
+# ── IntelliJ / Android Studio ────────────────────────────────────
+*.iml
+.idea/
+*.hprof
+*.jks
+*.keystore
+!debug.keystore
+.navigation/
+.DS_Store
+
+# ── Kotlin ───────────────────────────────────────────────────────
+*.kotlin_module
+.kotlin/
+kotlin-js-store/
+*.kts.tmp
+
+# ── 로컬 설정·비밀값 ─────────────────────────────────────────────
+secrets.properties
+keystore.properties
+*.env
+.env
+.env.*
+google-services.json
+
+# ── 로그·임시 파일 ───────────────────────────────────────────────
+*.log
+*.tmp
+*.swp
+*~
+.thumbnails/

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- 스티커 원본·인덱스는 사용자 단말 밖으로 나가지 않는다 -->
+    <exclude domain="file" path="stickers/" />
+    <exclude domain="sharedpref" path="." />
+</full-backup-content>

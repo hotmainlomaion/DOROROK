@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">도로록 키보드</string>
+    <string name="ime_name">도로록 키보드 (DOROROK)</string>
+    <string name="subtype_ko">한국어</string>
+    <string name="subtype_en">English</string>
+
+    <string name="studio_title">스티커 스튜디오</string>
+    <string name="studio_pick_photo">사진 고르기</string>
+    <string name="studio_cutting">누끼 따는 중…</string>
+    <string name="studio_save">스티커로 저장</string>
+    <string name="studio_caption_hint">한 줄 문구 (선택)</string>
+    <string name="ime_enable_hint">설정 → 언어 및 입력 → 키보드 관리에서 도로록 키보드를 켜 주세요.</string>
+</resources>
