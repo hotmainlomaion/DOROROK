@@ -62,9 +62,9 @@ object StickerSender {
         val contentInfo = InputContentInfoCompat(uri, description, null)
 
         val listener = InputConnectionCompat.OnCommitContentListener { inputContentInfo, flags, _ ->
-            val grantFlags = flags and
-                (InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION or
-                    InputConnectionCompat.INPUT_CONTENT_GRANT_WRITE_URI_PERMISSION)
+            val readFlag = InputConnectionCompat.INPUT_CONTENT_GRANT_READ_URI_PERMISSION
+            val writeFlag = InputConnectionCompat.INPUT_CONTENT_GRANT_WRITE_URI_PERMISSION
+            val grantFlags = flags and (readFlag or writeFlag)
             return@OnCommitContentListener try {
                 inputContentInfo.requestPermission(grantFlags)
                 true

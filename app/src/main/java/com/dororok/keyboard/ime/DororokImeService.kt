@@ -147,7 +147,8 @@ class DororokImeService : InputMethodService() {
     }
 
     override fun onDestroy() {
-        app.cutoutEngine.close()
+        // 누끼 엔진은 스튜디오(Activity)도 함께 쓰므로 여기서 닫지 않는다.
+        // 프로세스 종료 시 OS 가 정리한다.
         super.onDestroy()
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
             @Suppress("DEPRECATION")

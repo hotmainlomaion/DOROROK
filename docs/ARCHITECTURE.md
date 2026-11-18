@@ -159,7 +159,7 @@ Photo Picker (권한 요청 없음)
   → SubjectCutoutEngine.cutout(bitmap)
         · 최대 변 1024px 로 다운스케일 (연산량·메모리 상한)
         · ML Kit Subject Segmentation (SINGLE_IMAGE 모드)
-        · 결과: subject(배경 투명 Bitmap) + foregroundConfidences
+        · 결과: foregroundBitmap(배경 투명 Bitmap) + foregroundConfidenceMask
         · 5초 타임아웃
   → StickerComposer.compose(subject, outlinePx, caption)
   → PNG 저장 (filesDir/stickers/{id}.png) + index.json 갱신
@@ -169,27 +169,33 @@ Photo Picker (권한 요청 없음)
 ### 5.2 ML Kit 연동 세부
 
 ```kotlin
-val segmenter: Segmenter = Segmentation.getClient(
-    SubjectSegmenterOptions.builder()
-        .setDetectorMode(SubjectSegmenterOptions.SINGLE_IMAGE_MODE)
+// import com.google.mlkit.vision.segmentation.subject.*
+val segmenter: SubjectSegmenter = SubjectSegmentation.getClient(
+    SubjectSegmenterOptions.Builder()
+        .enableForegroundBitmap()          // 배경 투명 피사체 비트맵
+        .enableForegroundConfidenceMask()  // 픽셀별 신뢰도(품질 게이트용)
         .build(),
 )
-segmenter.process(InputImage.fromBitmap(bitmap, 0))
-```
+segmenter.process(InputImage.fromBitmap(bitmap, 0))  // Task<SubjectSegmentationResult>
+// → result.foregroundBitmap : Bitmap?
+// → result.foregroundConfidenceMask : FloatBuffer?
+// → result.subjects : List<Subject>  (enableMultipleSubjects() 시)
 
 | 결정 | 이유 |
 | :--- | :--- |
-| `SINGLE_IMAGE_MODE` | 스티커는 정지 사진 1장. 스트림 모드는 불필요한 프레임 파이프라인 |
+| 정지 이미지 전용 API | 이 모듈은 `process(InputImage)` 단일 이미지 API 만 제공한다. 스트림 모드가 없어 프레임 파이프라인을 끌어들일 여지가 없다 |
+| `enableForegroundBitmap()` 필수 | 꺼 두면 마스크만 받는다. 스티커는 투명 PNG 가 필요하므로 켠다 |
+| `enableMultipleSubjects()` 미사용 (MVP) | 한 사진에서 스티커 1장을 만든다. 다중 피사체 선택 UI 는 MVP 이후 |
 | 다운스케일 1024px | 스티커 출력은 최대 512px 수준. 1024 이상은 연산만 늘고 결과 차이 없음 |
 | `Task` → `suspendCancellableCoroutine` 어댑터 | `kotlinx-coroutines-play-services` 의존성을 추가하지 않으려고 직접 래핑 |
 | 타임아웃 5초 | 초기 모델 로딩이 느린 기기에서 무한 대기 방지 → 사용자에게 "다시 시도" 안내 |
 | `close()` | IME/앱 프로세스 종료 시 모델 메모리 해제 |
 
-**베타 API 주의**: `play-services-mlkit-subject-segmentation` 은 **16.0.0-beta1** 이고, 시그니처가 바뀔 수 있다. 영향 범위는 `SubjectCutoutEngine.kt` 한 파일로 한정되게 설계했다.
+**베타 API 주의**: `play-services-mlkit-subject-segmentation` 은 **16.0.0-beta1** 이고, 시그니처가 바뀔 수 있다. 실제 패키지는 `com.google.mlkit.vision.segmentation.subject` (`SubjectSegmentation` / `SubjectSegmenter` / `SubjectSegmenterOptions` / `SubjectSegmentationResult`)이며, 영향 범위는 `SubjectCutoutEngine.kt` 한 파일로 한정되게 설계했다.
 
 ### 5.3 품질 게이트 (예정)
 
-`foregroundConfidences` 는 픽셀별 신뢰도 배열이다. 지금은 사용하지 않지만, 다음 게이트를 3주차 검증에서 붙인다.
+`foregroundConfidenceMask` 는 픽셀별 신뢰도를 담은 `FloatBuffer` 다. 지금은 사용하지 않지만, 다음 게이트를 3주차 검증에서 붙인다.
 
 - 신뢰도 평균이 임계 이하 → "피사체를 못 찾았어요" 안내 후 재선택 유도.
 - 피사체 면적 비율이 너무 작으면(전체의 <3%) 합성 시 최소 테두리 두께를 키워 형태 유지.

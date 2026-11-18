@@ -3,7 +3,6 @@ package com.dororok.keyboard.wheel
 import kotlin.math.abs
 import kotlin.math.ln
 import kotlin.math.roundToInt
-import kotlin.math.sign
 
 /**
  * 가로 드럼 휠의 물리 모델.
@@ -58,6 +57,6 @@ object WheelPhysics {
     fun tickIntensity(velocityPxPerSec: Float): Float {
         val speed = abs(velocityPxPerSec)
         val normalized = (ln(1f + speed / 200f) / ln(1f + 20f)).coerceIn(0f, 1f)
-        return sign(1f) * (1f - 0.45f * normalized)
+        return (1f - 0.45f * normalized).coerceIn(0.55f, 1f)
     }
 }
